@@ -1,3 +1,6 @@
+# Fork of [serverless-webrtc-android](https://github.com/wojta/no-server-webrtc-android)
+Upgrade Android dependencies and improve UI
+
 # serverless-webrtc-android
 [![CircleCI](https://circleci.com/gh/wojta/no-server-webrtc-android.svg?style=svg)](https://circleci.com/gh/wojta/no-server-webrtc-android)
 

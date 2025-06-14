@@ -29,17 +29,13 @@ class RecyclerViewConsole(val view: RecyclerView) : IConsole {
         printf(view.context.getString(resId, args))
     }
 
-
     fun onSaveInstanceState(bundle: Bundle) {
         bundle.putStringArrayList(SAVE_LINES, lines)
     }
-
 
     fun initialize(bundle: Bundle?) {
         lines = bundle?.getStringArrayList(SAVE_LINES) ?: ArrayList()
         view.adapter = ConsoleAdapter(lines)
         handler = Handler(Looper.getMainLooper())
     }
-
-
 }

@@ -23,7 +23,6 @@ class ConsoleAdapter(val items: List<String>) : RecyclerView.Adapter<ConsoleAdap
         return ConsoleVH(view)
     }
 
-
     override fun getItemCount(): Int = items.count()
 
     override fun onBindViewHolder(holder: ConsoleVH, position: Int) {
@@ -32,7 +31,6 @@ class ConsoleAdapter(val items: List<String>) : RecyclerView.Adapter<ConsoleAdap
 
     class ConsoleVH(view: View) : RecyclerView.ViewHolder(view) {
         var tvText: TextView = view.findViewById(R.id.tvText)
-
         init {
             tvText.setOnLongClickListener {
                 //clipboard on long touch
@@ -45,5 +43,3 @@ class ConsoleAdapter(val items: List<String>) : RecyclerView.Adapter<ConsoleAdap
         }
     }
 }
-
-

@@ -11,8 +11,11 @@ import java.nio.charset.Charset
 /**
  * This class handles all around WebRTC peer connections.
  */
-class ServerlessRTCClient(val console: IConsole, val context: Context, val listener: IStateChangeListener) {
-
+class ServerlessRTCClient(
+    val console: IConsole,
+    val context: Context,
+    val listener: IStateChangeListener
+) {
     lateinit var pc: PeerConnection
     private var pcInitialized: Boolean = false
 
@@ -61,7 +64,7 @@ class ServerlessRTCClient(val console: IConsole, val context: Context, val liste
     lateinit var pcf: PeerConnectionFactory
     val pcConstraints = object : MediaConstraints() {
         init {
-            optional.add(MediaConstraints.KeyValuePair("DtlsSrtpKeyAgreement", "true"))
+            optional.add(KeyValuePair("DtlsSrtpKeyAgreement", "true"))
         }
     }
 
@@ -70,8 +73,6 @@ class ServerlessRTCClient(val console: IConsole, val context: Context, val liste
             field = value
             listener.onStateChanged(value)
         }
-        get
-
 
     interface IStateChangeListener {
         /**
@@ -81,7 +82,6 @@ class ServerlessRTCClient(val console: IConsole, val context: Context, val liste
     }
 
     abstract inner class DefaultObserver : PeerConnection.Observer {
-
         override fun onDataChannel(p0: DataChannel?) {
             console.d("data channel ${p0?.label()} established")
         }
@@ -102,17 +102,13 @@ class ServerlessRTCClient(val console: IConsole, val context: Context, val liste
             console.d("ice gathering state change:${p0?.name}")
         }
 
-        override fun onAddStream(p0: MediaStream?) {
-
-        }
+        override fun onAddStream(p0: MediaStream?) {}
 
         override fun onSignalingChange(p0: PeerConnection.SignalingState?) {
             console.d("signaling state change:${p0?.name}")
         }
 
-        override fun onRemoveStream(p0: MediaStream?) {
-
-        }
+        override fun onRemoveStream(p0: MediaStream?) {}
 
         override fun onRenegotiationNeeded() {
             console.d("renegotiation needed")
@@ -121,9 +117,7 @@ class ServerlessRTCClient(val console: IConsole, val context: Context, val liste
 
     open inner class DefaultSdpObserver : SdpObserver {
 
-        override fun onCreateSuccess(p0: SessionDescription?) {
-
-        }
+        override fun onCreateSuccess(p0: SessionDescription?) {}
 
         override fun onCreateFailure(p0: String?) {
             console.e("failed to create offer:$p0")
@@ -136,30 +130,24 @@ class ServerlessRTCClient(val console: IConsole, val context: Context, val liste
         override fun onSetSuccess() {
             console.i("set success")
         }
-
     }
-
 
     private val UTF_8 = Charset.forName("UTF-8")
 
     open inner class DefaultDataChannelObserver(val channel: DataChannel) : DataChannel.Observer {
-
-
         //TODO I'm not sure if this would handle really long messages
         override fun onMessage(p0: DataChannel.Buffer?) {
             val buf = p0?.data
             if (buf != null) {
                 val byteArray = ByteArray(buf.remaining())
                 buf.get(byteArray)
-                val received = kotlin.text.String(byteArray, UTF_8)
+                val received = String(byteArray, UTF_8)
                 try {
                     val message = JSONObject(received).getString(JSON_MESSAGE)
                     console.bluef("&gt;$message")
                 } catch (e: JSONException) {
                     console.redf("Malformed message received")
                 }
-
-
             }
         }
 
@@ -195,14 +183,12 @@ class ServerlessRTCClient(val console: IConsole, val context: Context, val liste
         return json
     }
 
-
     /**
      * Wait for an offer to be entered by user.
      */
     fun waitForOffer() {
         state = State.WAITING_FOR_OFFER
     }
-
 
     /**
      * Process offer that was entered by user (this is called getOffer() in JavaScript example)
@@ -243,10 +229,7 @@ class ServerlessRTCClient(val console: IConsole, val context: Context, val liste
                         channel = p0
                         p0?.registerObserver(DefaultDataChannelObserver(p0))
                     }
-
-
                 })!!
-
                 //we have remote offer, let's create answer for that
                 pc.setRemoteDescription(object : DefaultSdpObserver() {
                     override fun onSetSuccess() {
@@ -270,7 +253,6 @@ class ServerlessRTCClient(val console: IConsole, val context: Context, val liste
             state = State.WAITING_FOR_OFFER
         }
     }
-
 
     /**
      * Process answer that was entered by user (this is called getAnswer() in JavaScript example)
@@ -368,13 +350,16 @@ class ServerlessRTCClient(val console: IConsole, val context: Context, val liste
      * Call this before using anything else from PeerConnection.
      */
     fun init() {
-        val initializeOptions=PeerConnectionFactory.InitializationOptions.builder(context).setEnableVideoHwAcceleration(false).setEnableInternalTracer(false).createInitializationOptions()
+        val initializeOptions = PeerConnectionFactory.InitializationOptions
+            .builder(context)
+            /*.setEnableVideoHwAcceleration(false)*/
+            .setEnableInternalTracer(false)
+            .createInitializationOptions()
         PeerConnectionFactory.initialize(initializeOptions)
         val options=PeerConnectionFactory.Options()
         pcf = PeerConnectionFactory.builder().setOptions(options).createPeerConnectionFactory()
         state = State.INITIALIZING
     }
-
 
     /**
      * Clean up some resources.

@@ -12,7 +12,7 @@ interface IConsole {
     fun printf(resId: Int, vararg args: Any)
 
     fun d(text: String, vararg args: Any) {
-        if (BuildConfig.DEBUG) printf("<font color=\"#AAAAAA\">$text</font>")
+        if (BuildConfig.DEBUG) printf("<font color=\"#673AB7\">$text</font>")
     }
 
     fun i(text: String, vararg args: Any) {
