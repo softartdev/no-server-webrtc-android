@@ -1,5 +1,8 @@
 # Fork of [serverless-webrtc-android](https://github.com/wojta/no-server-webrtc-android)
-Upgrade Android dependencies and improve UI
+- Upgrade Android dependencies and improve UI
+- Displaying data as QR codes for easier copying
+
+<img src=".github/main.png" width="320"> <img src=".github/console.png" width="320"> <img src=".github/qr.png" width="320">
 
 # serverless-webrtc-android
 [![CircleCI](https://circleci.com/gh/wojta/no-server-webrtc-android.svg?style=svg)](https://circleci.com/gh/wojta/no-server-webrtc-android)
@@ -30,9 +33,6 @@ It can even punch through some NAT mechanisms.
 It uses **libjingle** library, it's a native library for WebRTC that comes with [Chromium](https://www.chromium.org/). There is also JNI wrapper for use in Java. You can compile it by yourself but it's extremely tricky. You can use already build dependency in your `build.gradle`. This helped me a lot:
 * http://tech.pristine.io/automated-webrtc-building/
 * https://github.com/pristineio/webrtc-build-scripts
-
-# Usage
-<img src=".github/create_offer.png" width="320"> <img src=".github/paste_answer.png" width="320"> <img src=".github/demo.png" width="320">
 
 # Known issues
 * There is no renegotiation of connection, it doesn't make much sense without signalling server.
