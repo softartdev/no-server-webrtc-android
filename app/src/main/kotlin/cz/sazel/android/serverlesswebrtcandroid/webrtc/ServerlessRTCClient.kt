@@ -24,7 +24,7 @@ class ServerlessRTCClient(
     /**
      * List of servers that will be used to establish the direct connection, STUN/TURN should be supported.
      */
-    val iceServers = arrayListOf(PeerConnection.IceServer("stun:stun.l.google.com:19302"))
+    val iceServers = arrayListOf(PeerConnection.IceServer.builder("stun:stun.l.google.com:19302").createIceServer())
 
     enum class State {
         /**
@@ -160,6 +160,9 @@ class ServerlessRTCClient(
             if (channel.state() == DataChannel.State.OPEN) {
                 state = State.CHAT_ESTABLISHED
                 console.bluef("Chat established.")
+                // print to console current connection like "ip(1):port1 -> ... -> ip(N):port"
+                val remoteAddress = pc.remoteDescription?.description ?: "unknown"
+                console.printf("Connected to remote peer: $remoteAddress")
             } else {
                 state = State.CHAT_ENDED
                 console.redf("Chat ended.")
