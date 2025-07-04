@@ -1,12 +1,8 @@
 package cz.sazel.android.serverlesswebrtcandroid.ui.components
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.text.Html
-import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -23,7 +19,6 @@ import androidx.core.graphics.set
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.common.BitMatrix
 import com.google.zxing.qrcode.QRCodeWriter
-import cz.sazel.android.serverlesswebrtcandroid.R
 
 @Composable
 fun ConsoleItem(
@@ -33,28 +28,26 @@ fun ConsoleItem(
     val context = LocalContext.current
     var showQRDialog by remember { mutableStateOf(false) }
     
-    SelectionContainer {
-        Card(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 4.dp)
-                .clickable {
-                    // Show QR code on click
-                    showQRDialog = true
-                },
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-        ) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        SelectionContainer {
             Text(
                 text = Html.fromHtml(message, Html.FROM_HTML_MODE_LEGACY).toString(),
                 modifier = Modifier
                     .padding(16.dp)
                     .clickable {
-                        // Copy to clipboard on long click
-                        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                        clipboard.setPrimaryClip(ClipData.newPlainText("text", message))
-                        Toast.makeText(context, R.string.clipboard_copy, Toast.LENGTH_SHORT).show()
+                        // Show QR code on click
+                        showQRDialog = true
                     },
-                fontFamily = FontFamily.Monospace
+                fontFamily = FontFamily.Monospace,
+                onTextLayout = { _ ->
+                    // Handle long click for copy to clipboard
+                    // This is handled through SelectionContainer which allows text selection
+                }
             )
         }
     }
