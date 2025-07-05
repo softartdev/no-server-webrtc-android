@@ -6,23 +6,21 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import cz.sazel.android.serverlesswebrtcandroid.console.IConsole
 import cz.sazel.android.serverlesswebrtcandroid.webrtc.ServerlessRTCClient
+import cz.sazel.android.serverlesswebrtcandroid.webrtc.ServerlessRTCClient.State.CHAT_ENDED
+import cz.sazel.android.serverlesswebrtcandroid.webrtc.ServerlessRTCClient.State.CHAT_ESTABLISHED
+import cz.sazel.android.serverlesswebrtcandroid.webrtc.ServerlessRTCClient.State.CREATING_ANSWER
+import cz.sazel.android.serverlesswebrtcandroid.webrtc.ServerlessRTCClient.State.CREATING_OFFER
+import cz.sazel.android.serverlesswebrtcandroid.webrtc.ServerlessRTCClient.State.INITIALIZING
+import cz.sazel.android.serverlesswebrtcandroid.webrtc.ServerlessRTCClient.State.WAITING_FOR_ANSWER
+import cz.sazel.android.serverlesswebrtcandroid.webrtc.ServerlessRTCClient.State.WAITING_FOR_OFFER
+import cz.sazel.android.serverlesswebrtcandroid.webrtc.ServerlessRTCClient.State.WAITING_TO_CONNECT
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.*
 
-data class MainUiState(
-    val consoleMessages: List<String> = emptyList(),
-    val inputText: String = "",
-    val inputHint: String = "",
-    val isInputEnabled: Boolean = true,
-    val isProgressVisible: Boolean = false,
-    val isCreateOfferVisible: Boolean = false,
-    val currentState: ServerlessRTCClient.State = ServerlessRTCClient.State.INITIALIZING
-)
-
-class MainViewModel(application: Application) : AndroidViewModel(application), 
+class MainViewModel(application: Application) : AndroidViewModel(application),
     ServerlessRTCClient.IStateChangeListener, IConsole {
     
     private val _uiState = MutableStateFlow(MainUiState())
@@ -53,9 +51,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application),
     fun sendMessage(text: String) {
         val trimmedText = text.trim()
         when (client.state) {
-            ServerlessRTCClient.State.WAITING_FOR_OFFER -> client.processOffer(trimmedText)
-            ServerlessRTCClient.State.WAITING_FOR_ANSWER -> client.processAnswer(trimmedText)
-            ServerlessRTCClient.State.CHAT_ESTABLISHED -> {
+            WAITING_FOR_OFFER -> client.processOffer(trimmedText)
+            WAITING_FOR_ANSWER -> client.processAnswer(trimmedText)
+            CHAT_ESTABLISHED -> {
                 if (trimmedText.isNotBlank()) {
                     client.sendMessage(trimmedText)
                     printf("&gt;$trimmedText")
@@ -73,51 +71,33 @@ class MainViewModel(application: Application) : AndroidViewModel(application),
     fun makeOffer() {
         client.makeOffer()
     }
-    
-    fun waitForOffer() {
-        client.waitForOffer()
-    }
-    
+
     override fun onStateChanged(state: ServerlessRTCClient.State) {
         viewModelScope.launch {
-            val currentState = _uiState.value
             val context = getApplication<Application>()
             val hint = when (state) {
-                ServerlessRTCClient.State.WAITING_FOR_OFFER -> context.getString(cz.sazel.android.serverlesswebrtcandroid.R.string.hint_paste_offer)
-                ServerlessRTCClient.State.WAITING_FOR_ANSWER -> context.getString(cz.sazel.android.serverlesswebrtcandroid.R.string.hint_paste_answer)
-                ServerlessRTCClient.State.CHAT_ESTABLISHED -> context.getString(cz.sazel.android.serverlesswebrtcandroid.R.string.enter_message)
-                ServerlessRTCClient.State.WAITING_TO_CONNECT,
-                ServerlessRTCClient.State.CREATING_OFFER,
-                ServerlessRTCClient.State.CREATING_ANSWER -> state.name
+                WAITING_FOR_OFFER -> context.getString(cz.sazel.android.serverlesswebrtcandroid.R.string.hint_paste_offer)
+                WAITING_FOR_ANSWER -> context.getString(cz.sazel.android.serverlesswebrtcandroid.R.string.hint_paste_answer)
+                CHAT_ESTABLISHED -> context.getString(cz.sazel.android.serverlesswebrtcandroid.R.string.enter_message)
+                WAITING_TO_CONNECT,
+                CREATING_OFFER,
+                CREATING_ANSWER -> state.name
                 else -> ""
             }
-            
             val isInputEnabled = when (state) {
-                ServerlessRTCClient.State.WAITING_TO_CONNECT,
-                ServerlessRTCClient.State.CREATING_OFFER,
-                ServerlessRTCClient.State.CREATING_ANSWER -> false
+                WAITING_TO_CONNECT,
+                CREATING_OFFER,
+                CREATING_ANSWER -> false
                 else -> true
             }
-            
-            val isProgressVisible = when (state) {
-                ServerlessRTCClient.State.WAITING_TO_CONNECT,
-                ServerlessRTCClient.State.CREATING_OFFER,
-                ServerlessRTCClient.State.CREATING_ANSWER -> true
-                else -> false
-            }
-            
-            val isCreateOfferVisible = state == ServerlessRTCClient.State.WAITING_FOR_OFFER
-            
-            if (state == ServerlessRTCClient.State.CHAT_ENDED || 
-                state == ServerlessRTCClient.State.INITIALIZING) {
+            if (state == CHAT_ENDED || state == INITIALIZING) {
                 client.waitForOffer()
             }
-            
-            _uiState.value = currentState.copy(
+            _uiState.value = _uiState.value.copy(
                 inputHint = hint,
                 isInputEnabled = isInputEnabled,
-                isProgressVisible = isProgressVisible,
-                isCreateOfferVisible = isCreateOfferVisible,
+                isProgressVisible = !isInputEnabled,
+                isCreateOfferVisible = state == WAITING_FOR_OFFER,
                 currentState = state
             )
         }
@@ -127,9 +107,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application),
         viewModelScope.launch {
             val formattedText = String.format(Locale.getDefault(), text, *args)
             consoleMessages.add(formattedText)
-            _uiState.value = _uiState.value.copy(
-                consoleMessages = consoleMessages.toList()
-            )
+            _uiState.value = _uiState.value.copy(consoleMessages = consoleMessages.toList())
         }
     }
     
@@ -140,9 +118,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application),
     fun restoreConsoleMessages(messages: List<String>) {
         consoleMessages.clear()
         consoleMessages.addAll(messages)
-        _uiState.value = _uiState.value.copy(
-            consoleMessages = consoleMessages.toList()
-        )
+        _uiState.value = _uiState.value.copy(consoleMessages = consoleMessages.toList())
     }
     
     override fun onCleared() {

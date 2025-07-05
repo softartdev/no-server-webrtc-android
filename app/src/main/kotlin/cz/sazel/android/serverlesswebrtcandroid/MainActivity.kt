@@ -71,11 +71,4 @@ class MainActivity : ComponentActivity() {
         val messages = viewModel.uiState.value.consoleMessages
         outState.putStringArrayList("SAVE_LINES", ArrayList(messages))
     }
-
-    override fun onDestroy() {
-        if (!retainInstance && ::viewModel.isInitialized) {
-            // ViewModel will handle client cleanup in onCleared()
-        }
-        super.onDestroy()
-    }
 }
