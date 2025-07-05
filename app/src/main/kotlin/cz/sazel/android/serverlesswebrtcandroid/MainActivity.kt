@@ -7,7 +7,9 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cz.sazel.android.serverlesswebrtcandroid.ui.MainViewModel
 import cz.sazel.android.serverlesswebrtcandroid.ui.screens.MainScreen
@@ -46,16 +48,11 @@ class MainActivity : ComponentActivity() {
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
                 MainScreen(
+                    modifier = Modifier.imePadding(),
                     uiState = uiState,
-                    onInputTextChanged = { text ->
-                        viewModel.updateInputText(text)
-                    },
-                    onSendMessage = { text ->
-                        viewModel.sendMessage(text)
-                    },
-                    onCreateOffer = {
-                        viewModel.makeOffer()
-                    }
+                    onInputTextChanged = viewModel::updateInputText,
+                    onSendMessage = viewModel::sendMessage,
+                    onCreateOffer = viewModel::makeOffer
                 )
             }
         }
