@@ -1,12 +1,11 @@
 # Fork of [serverless-webrtc-android](https://github.com/wojta/no-server-webrtc-android)
+[![Android CI](https://github.com/softartdev/no-server-webrtc-android/actions/workflows/android.yml/badge.svg)](https://github.com/softartdev/no-server-webrtc-android/actions/workflows/android.yml)
 - Upgrade Android dependencies and improve UI
 - Displaying data as QR codes for easier copying
 
-<img src=".github/main.png" width="320"> <img src=".github/console.png" width="320"> <img src=".github/qr.png" width="320">
+<img src=".github/main.png" width="240"> <img src=".github/console.png" width="240"> <img src=".github/qr.png" width="240">
 
 # serverless-webrtc-android
-[![CircleCI](https://circleci.com/gh/wojta/no-server-webrtc-android.svg?style=svg)](https://circleci.com/gh/wojta/no-server-webrtc-android)
-
 A demo of using WebRTC with no signaling server. But for Android written in Kotlin.
 
 Compatible and inspired by this project written for JavaScript by Chris Ball:
@@ -15,7 +14,6 @@ Compatible and inspired by this project written for JavaScript by Chris Ball:
 * https://cjb.github.io/serverless-webrtc/serverless-webrtc.html
 
 # What is WebRTC?
-<img src="https://webrtc.org/assets/images/webrtc-logo-vert-retro-255x305.png" width="96">
 It's technology for real time peer to peer comunication. Especially useful for transfering audio and video - teleconference apps, but can be used for ordinary data as in this example.
 WebRTC is supported in recent Chrome browser, Node.js and also on Android/iOS.
 
