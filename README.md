@@ -1,5 +1,6 @@
 # Fork of [serverless-webrtc-android](https://github.com/wojta/no-server-webrtc-android)
 [![Android CI](https://github.com/softartdev/no-server-webrtc-android/actions/workflows/android.yml/badge.svg)](https://github.com/softartdev/no-server-webrtc-android/actions/workflows/android.yml)
+
 ⬇️ [Download APK](https://github.com/softartdev/no-server-webrtc-android/releases/latest)
 - Upgrade Android dependencies and improve UI
 - Displaying data as QR codes for easier copying
